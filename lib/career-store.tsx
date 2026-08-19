@@ -18,6 +18,10 @@ export type CareerState = {
   completedChallenges: string[];
   seasonEnded: boolean;
   seasonAward: string | null;
+  season: number;
+  round: number;
+  difficulty: "Normal" | "Desafio";
+  seasonHistory: Array<{ season: number; wins: number; losses: number; award: string }>;
 };
 
 const initialState: CareerState = {
@@ -34,6 +38,10 @@ const initialState: CareerState = {
   completedChallenges: [],
   seasonEnded: false,
   seasonAward: null,
+  season: 1,
+  round: 19,
+  difficulty: "Normal",
+  seasonHistory: [],
 };
 
 type CareerContextValue = CareerState & {
@@ -44,6 +52,7 @@ type CareerContextValue = CareerState & {
   train: () => void;
   playGame: (strategy: string) => { homeScore: number; awayScore: number };
   chooseDirectorDecision: (choice: string) => void;
+  startNextSeason: () => void;
   resetCareer: () => void;
 };
 
@@ -97,12 +106,16 @@ export function CareerProvider({ children }: PropsWithChildren) {
         const completed = [...current.completedChallenges];
         if (defenseProgress >= 1 && !completed.includes("defense")) completed.push("defense");
         if (threeProgress >= 1 && !completed.includes("three")) completed.push("three");
+        const nextLosses = current.losses + (won ? 0 : 1);
         const seasonEnded = nextWins >= 18;
-        return { ...current, lastResult: nextResult, wins: nextWins, losses: current.losses + (won ? 0 : 1), credits: current.credits + (won ? 120 : 35) + (completed.length - current.completedChallenges.length) * 180, trainingDone: false, directorMessage: won ? "Boa resposta. A diretoria liberou verba extra para o próximo desafio." : "A diretoria pede reação imediata no próximo jogo.", challengeProgress: { defense: defenseProgress, three: threeProgress }, completedChallenges: completed, seasonEnded, seasonAward: seasonEnded ? (nextWins >= 20 ? "Campeão da Conferência" : "Campanha de destaque") : current.seasonAward };
+        const seasonAward = seasonEnded ? (nextWins >= 20 ? "Campeão da Conferência" : "Campanha de destaque") : current.seasonAward;
+        const seasonHistory = seasonEnded && !current.seasonEnded ? [...current.seasonHistory, { season: current.season, wins: nextWins, losses: nextLosses, award: seasonAward ?? "Campanha concluída" }] : current.seasonHistory;
+        return { ...current, lastResult: nextResult, wins: nextWins, losses: nextLosses, round: current.round + 1, credits: current.credits + (won ? 120 : 35) + (completed.length - current.completedChallenges.length) * 180, trainingDone: false, directorMessage: won ? "Boa resposta. A diretoria liberou verba extra para o próximo desafio." : "A diretoria pede reação imediata no próximo jogo.", challengeProgress: { defense: defenseProgress, three: threeProgress }, completedChallenges: completed, seasonEnded, seasonAward, seasonHistory };
       });
       return nextResult;
     },
     chooseDirectorDecision: (choice) => setState((current) => ({ ...current, directorChoice: choice, credits: current.credits + (choice === "base" ? 40 : 25), directorMessage: choice === "base" ? "A base recebeu investimento e um novo talento será observado." : "A torcida ganhou prioridade e o ginásio terá clima especial." })),
+    startNextSeason: () => setState((current) => ({ ...current, season: current.season + 1, round: 1, wins: 0, losses: 0, credits: current.credits + 300, difficulty: current.season % 2 === 0 ? "Normal" : "Desafio", trainingDone: false, lastResult: null, directorChoice: null, directorMessage: "Nova temporada, novas metas. A diretoria espera evolução.", challengeProgress: { defense: 0, three: 0 }, completedChallenges: [], seasonEnded: false, seasonAward: null })),
     resetCareer: () => setState(initialState),
   }), [state, hydrated]);
 

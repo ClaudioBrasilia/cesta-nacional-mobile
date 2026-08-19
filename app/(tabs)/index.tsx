@@ -2,17 +2,19 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { teams } from "@/lib/game-data";
+import { seasonSchedule, teams } from "@/lib/game-data";
 import { useColors } from "@/hooks/use-colors";
 import { useCareer } from "@/lib/career-store";
 
 const club = teams[0];
-const opponent = teams[1];
+const defaultOpponent = teams[1];
 
 export default function HomeScreen() {
   const colors = useColors();
   const [strategy, setStrategy] = useState("control");
-  const { credits, wins, losses, roster, lastResult: result, playGame, challengeProgress, completedChallenges, seasonEnded, seasonAward } = useCareer();
+  const { credits, wins, losses, roster, lastResult: result, playGame, challengeProgress, completedChallenges, seasonEnded, seasonAward, season, round, difficulty } = useCareer();
+  const scheduleGame = seasonSchedule[(round - 19) % seasonSchedule.length] ?? seasonSchedule[0];
+  const opponent = teams.find((team) => team.name === scheduleGame.opponent) ?? defaultOpponent;
   const starters = roster.filter((player) => player.starter);
 
 
@@ -21,7 +23,7 @@ export default function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <View>
-            <Text style={[styles.eyebrow, { color: colors.muted }]}>CAMPANHA • TEMPORADA 1</Text>
+            <Text style={[styles.eyebrow, { color: colors.muted }]}>CAMPANHA • TEMPORADA {season}</Text>
             <Text style={[styles.title, { color: colors.foreground }]}>Cesta Nacional</Text>
           </View>
           <View style={[styles.creditPill, { backgroundColor: colors.surface }]}>
@@ -45,10 +47,10 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <View style={styles.sectionHeader}><Text style={[styles.sectionTitle, { color: colors.foreground }]}>Próximo desafio</Text><Text style={[styles.roundText, { color: colors.muted }]}>Rodada 19</Text></View>
+        <View style={styles.sectionHeader}><Text style={[styles.sectionTitle, { color: colors.foreground }]}>Próximo desafio</Text><Text style={[styles.roundText, { color: colors.primary }]}>Rodada {round} • {difficulty}</Text></View>
         <View style={[styles.matchCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={styles.teamBlock}><View style={[styles.miniBadge, { backgroundColor: club.color }]}><IconSymbol name="basketball.fill" size={18} color="#071A2B" /></View><Text style={[styles.teamName, { color: colors.foreground }]}>{club.name}</Text><Text style={[styles.teamTag, { color: colors.success }]}>CASA</Text></View>
-          <View style={styles.vsBlock}><Text style={[styles.vs, { color: colors.foreground }]}>VS</Text><Text style={[styles.gameTime, { color: colors.muted }]}>Hoje • 20:00</Text></View>
+          <View style={styles.vsBlock}><Text style={[styles.vs, { color: colors.foreground }]}>VS</Text><Text style={[styles.gameTime, { color: colors.muted }]}>{scheduleGame.date}</Text></View>
           <View style={styles.teamBlock}><View style={[styles.miniBadge, { backgroundColor: opponent.color }]}><IconSymbol name="basketball.fill" size={18} color="#071A2B" /></View><Text style={[styles.teamName, { color: colors.foreground }]}>{opponent.name}</Text><Text style={[styles.teamTag, { color: colors.muted }]}>FORA</Text></View>
         </View>
 

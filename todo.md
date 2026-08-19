@@ -41,3 +41,9 @@
 - [x] Tornar desafios verificáveis durante as partidas
 - [x] Implementar encerramento da temporada com premiações
 - [x] Gerar novos objetivos para a temporada seguinte
+
+- [x] Criar tela de premiação e resumo da temporada
+- [x] Avançar calendário automaticamente após cada partida
+- [x] Atualizar próxima partida conforme a rodada
+- [x] Implementar nova temporada jogável
+- [x] Adicionar dificuldade, orçamento e objetivos renovados
