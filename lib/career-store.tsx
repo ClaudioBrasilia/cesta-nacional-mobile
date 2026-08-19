@@ -12,6 +12,8 @@ export type CareerState = {
   losses: number;
   trainingDone: boolean;
   lastResult: { homeScore: number; awayScore: number } | null;
+  directorChoice: string | null;
+  directorMessage: string;
 };
 
 const initialState: CareerState = {
@@ -22,6 +24,8 @@ const initialState: CareerState = {
   losses: 6,
   trainingDone: false,
   lastResult: null,
+  directorChoice: null,
+  directorMessage: "A diretoria espera uma campanha competitiva.",
 };
 
 type CareerContextValue = CareerState & {
@@ -31,6 +35,7 @@ type CareerContextValue = CareerState & {
   buyPlayer: (playerId: string, cost: number) => boolean;
   train: () => void;
   playGame: (strategy: string) => { homeScore: number; awayScore: number };
+  chooseDirectorDecision: (choice: string) => void;
   resetCareer: () => void;
 };
 
@@ -75,9 +80,11 @@ export function CareerProvider({ children }: PropsWithChildren) {
     train: () => setState((current) => ({ ...current, trainingDone: true })),
     playGame: (strategy) => {
       const result = simulateMatch(78, 84, strategy);
-      setState((current) => ({ ...current, lastResult: result, wins: current.wins + (result.homeScore > result.awayScore ? 1 : 0), losses: current.losses + (result.homeScore <= result.awayScore ? 1 : 0), credits: current.credits + (result.homeScore > result.awayScore ? 120 : 35), trainingDone: false }));
+      const won = result.homeScore > result.awayScore;
+      setState((current) => ({ ...current, lastResult: result, wins: current.wins + (won ? 1 : 0), losses: current.losses + (won ? 0 : 1), credits: current.credits + (won ? 120 : 35), trainingDone: false, directorMessage: won ? "Boa resposta. A diretoria liberou verba extra para o próximo desafio." : "A diretoria pede reação imediata no próximo jogo." }));
       return result;
     },
+    chooseDirectorDecision: (choice) => setState((current) => ({ ...current, directorChoice: choice, credits: current.credits + (choice === "base" ? 40 : 25), directorMessage: choice === "base" ? "A base recebeu investimento e um novo talento será observado." : "A torcida ganhou prioridade e o ginásio terá clima especial." })),
     resetCareer: () => setState(initialState),
   }), [state, hydrated]);
 

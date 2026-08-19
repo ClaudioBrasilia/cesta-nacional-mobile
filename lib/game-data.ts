@@ -71,6 +71,19 @@ export const currentUpdate = {
   published: "Atualizado hoje",
 };
 
+export const contentDrop = {
+  version: "0.3.0",
+  clubs: ["Manaus Araras", "Curitiba Pinheiros"],
+  athletes: [
+    { name: "Nando Ribeiro", position: "ALA", overall: 76, style: "Transição veloz" },
+    { name: "Pedro Luz", position: "PIVÔ", overall: 78, style: "Rebote ofensivo" },
+  ],
+  challenges: [
+    { title: "Muralha do garrafão", copy: "Vença sofrendo menos de 72 pontos.", reward: 180 },
+    { title: "Mão quente", copy: "Converta oito bolas de três em uma partida.", reward: 220 },
+  ],
+};
+
 export const updateNotes = [
   { title: "Forma defensiva em alta", text: "Ajustes leves valorizaram jogadores que combinam rebotes, tocos e bolas recuperadas." },
   { title: "Mercado de jovens", text: "Novos talentos fictícios podem aparecer no mercado após a próxima rodada." },

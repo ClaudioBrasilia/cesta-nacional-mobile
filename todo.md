@@ -29,3 +29,10 @@
 - [x] Implementar evolução de atributos e histórico estatístico
 - [x] Criar primeiro pacote periódico de atualização
 - [x] Adicionar novos atletas, desafios e notas de balanceamento
+
+- [x] Tornar classificação reativa aos resultados das partidas
+- [x] Tornar objetivos da diretoria reativos à campanha
+- [x] Criar notícias da temporada
+- [x] Adicionar decisões da diretoria com efeitos no clube
+- [x] Criar novo pacote com clubes e atletas fictícios
+- [x] Adicionar novos desafios e recompensas
