@@ -71,6 +71,12 @@ export const currentUpdate = {
   published: "Atualizado hoje",
 };
 
+export const seasonNews = [
+  { day: "RODADA 18", title: "Brasília Estrelas cresce no fim", text: "A defesa segurou o último período e garantiu uma vitória importante em casa.", tone: "win" },
+  { day: "MERCADO", title: "Novos talentos movimentam a liga", text: "Três atletas fictícios chegaram ao mercado em busca de um projeto competitivo.", tone: "market" },
+  { day: "DIRETORIA", title: "Base recebe atenção especial", text: "O clube iniciou uma nova frente de observação para jovens promessas.", tone: "club" },
+];
+
 export const contentDrop = {
   version: "0.3.0",
   clubs: ["Manaus Araras", "Curitiba Pinheiros"],

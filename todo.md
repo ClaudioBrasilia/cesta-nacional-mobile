@@ -36,3 +36,8 @@
 - [x] Adicionar decisões da diretoria com efeitos no clube
 - [x] Criar novo pacote com clubes e atletas fictícios
 - [x] Adicionar novos desafios e recompensas
+
+- [x] Criar tela e histórico de notícias da temporada
+- [x] Tornar desafios verificáveis durante as partidas
+- [x] Implementar encerramento da temporada com premiações
+- [x] Gerar novos objetivos para a temporada seguinte

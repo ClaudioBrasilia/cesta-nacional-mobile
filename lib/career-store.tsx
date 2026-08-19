@@ -14,6 +14,10 @@ export type CareerState = {
   lastResult: { homeScore: number; awayScore: number } | null;
   directorChoice: string | null;
   directorMessage: string;
+  challengeProgress: Record<string, number>;
+  completedChallenges: string[];
+  seasonEnded: boolean;
+  seasonAward: string | null;
 };
 
 const initialState: CareerState = {
@@ -26,6 +30,10 @@ const initialState: CareerState = {
   lastResult: null,
   directorChoice: null,
   directorMessage: "A diretoria espera uma campanha competitiva.",
+  challengeProgress: { defense: 0, three: 0 },
+  completedChallenges: [],
+  seasonEnded: false,
+  seasonAward: null,
 };
 
 type CareerContextValue = CareerState & {
@@ -81,8 +89,18 @@ export function CareerProvider({ children }: PropsWithChildren) {
     playGame: (strategy) => {
       const result = simulateMatch(78, 84, strategy);
       const won = result.homeScore > result.awayScore;
-      setState((current) => ({ ...current, lastResult: result, wins: current.wins + (won ? 1 : 0), losses: current.losses + (won ? 0 : 1), credits: current.credits + (won ? 120 : 35), trainingDone: false, directorMessage: won ? "Boa resposta. A diretoria liberou verba extra para o próximo desafio." : "A diretoria pede reação imediata no próximo jogo." }));
-      return result;
+      let nextResult: { homeScore: number; awayScore: number } = result;
+      setState((current) => {
+        const nextWins = current.wins + (won ? 1 : 0);
+        const defenseProgress = result.awayScore < 72 ? current.challengeProgress.defense + 1 : current.challengeProgress.defense;
+        const threeProgress = strategy === "three" && result.homeScore > 80 ? current.challengeProgress.three + 1 : current.challengeProgress.three;
+        const completed = [...current.completedChallenges];
+        if (defenseProgress >= 1 && !completed.includes("defense")) completed.push("defense");
+        if (threeProgress >= 1 && !completed.includes("three")) completed.push("three");
+        const seasonEnded = nextWins >= 18;
+        return { ...current, lastResult: nextResult, wins: nextWins, losses: current.losses + (won ? 0 : 1), credits: current.credits + (won ? 120 : 35) + (completed.length - current.completedChallenges.length) * 180, trainingDone: false, directorMessage: won ? "Boa resposta. A diretoria liberou verba extra para o próximo desafio." : "A diretoria pede reação imediata no próximo jogo.", challengeProgress: { defense: defenseProgress, three: threeProgress }, completedChallenges: completed, seasonEnded, seasonAward: seasonEnded ? (nextWins >= 20 ? "Campeão da Conferência" : "Campanha de destaque") : current.seasonAward };
+      });
+      return nextResult;
     },
     chooseDirectorDecision: (choice) => setState((current) => ({ ...current, directorChoice: choice, credits: current.credits + (choice === "base" ? 40 : 25), directorMessage: choice === "base" ? "A base recebeu investimento e um novo talento será observado." : "A torcida ganhou prioridade e o ginásio terá clima especial." })),
     resetCareer: () => setState(initialState),
