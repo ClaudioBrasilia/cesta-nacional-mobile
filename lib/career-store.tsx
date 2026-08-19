@@ -23,6 +23,9 @@ export type CareerState = {
   difficulty: "Normal" | "Desafio";
   seasonHistory: Array<{ season: number; wins: number; losses: number; award: string }>;
   playerProgress: Record<string, number>;
+  retiredIds: string[];
+  seasonBudget: number;
+  seasonObjective: string;
 };
 
 const initialState: CareerState = {
@@ -44,6 +47,9 @@ const initialState: CareerState = {
   difficulty: "Normal",
   seasonHistory: [],
   playerProgress: Object.fromEntries(players.map((player) => [player.id, 0])),
+  retiredIds: [],
+  seasonBudget: 1240,
+  seasonObjective: "Campanha competitiva",
 };
 
 type CareerContextValue = CareerState & {
@@ -54,7 +60,7 @@ type CareerContextValue = CareerState & {
   train: () => void;
   playGame: (strategy: string) => { homeScore: number; awayScore: number };
   chooseDirectorDecision: (choice: string) => void;
-  startNextSeason: () => void;
+  startNextSeason: (budgetBonus?: number, difficulty?: "Normal" | "Desafio", objective?: string) => void;
   resetCareer: () => void;
 };
 
@@ -80,7 +86,7 @@ export function CareerProvider({ children }: PropsWithChildren) {
   const value = useMemo<CareerContextValue>(() => ({
     ...state,
     hydrated,
-    roster: players.filter((player) => state.ownedIds.includes(player.id)).map((player) => ({ ...player, age: player.age + state.season - 1, overall: player.overall + (state.playerProgress[player.id] ?? 0), starter: state.starterIds.includes(player.id) })),
+    roster: players.filter((player) => state.ownedIds.includes(player.id) && !state.retiredIds.includes(player.id)).map((player) => { const age = player.age + state.season - 1; const agePenalty = age >= 30 ? Math.min(6, Math.floor((age - 29) / 2)) : 0; return { ...player, age, overall: Math.max(60, player.overall + (state.playerProgress[player.id] ?? 0) - agePenalty), starter: state.starterIds.includes(player.id) }; }),
     toggleStarter: (playerId) => setState((current) => {
       const isStarter = current.starterIds.includes(playerId);
       if (isStarter) return { ...current, starterIds: current.starterIds.filter((id) => id !== playerId) };
@@ -117,14 +123,19 @@ export function CareerProvider({ children }: PropsWithChildren) {
       return nextResult;
     },
     chooseDirectorDecision: (choice) => setState((current) => ({ ...current, directorChoice: choice, credits: current.credits + (choice === "base" ? 40 : 25), directorMessage: choice === "base" ? "A base recebeu investimento e um novo talento será observado." : "A torcida ganhou prioridade e o ginásio terá clima especial." })),
-    startNextSeason: () => setState((current) => {
+    startNextSeason: (budgetBonus = 300, difficultyOption, objective) => setState((current) => {
       const playerProgress = { ...current.playerProgress };
+      const retiredIds = [...current.retiredIds];
       current.ownedIds.forEach((id) => {
         const player = players.find((item) => item.id === id);
-        const gain = player?.potential === "Elite" || player?.potential === "Muito alto" ? 2 : player?.potential === "Alto" ? 1 : 0;
+        if (!player) return;
+        const nextAge = player.age + current.season;
+        if (nextAge >= 35 && !retiredIds.includes(id)) retiredIds.push(id);
+        const gain = player.potential === "Elite" || player.potential === "Muito alto" ? 2 : player.potential === "Alto" ? 1 : 0;
         playerProgress[id] = (playerProgress[id] ?? 0) + gain;
       });
-      return { ...current, season: current.season + 1, round: 1, wins: 0, losses: 0, credits: current.credits + 300, difficulty: current.season % 2 === 0 ? "Normal" : "Desafio", trainingDone: false, lastResult: null, directorChoice: null, directorMessage: "Nova temporada, novas metas. A diretoria espera evolução.", challengeProgress: { defense: 0, three: 0 }, completedChallenges: [], seasonEnded: false, seasonAward: null, playerProgress };
+      const nextDifficulty: "Normal" | "Desafio" = difficultyOption ?? (current.season % 2 === 0 ? "Normal" : "Desafio");
+      return { ...current, season: current.season + 1, round: 1, wins: 0, losses: 0, credits: current.credits + budgetBonus, seasonBudget: current.credits + budgetBonus, difficulty: nextDifficulty, seasonObjective: objective ?? (nextDifficulty === "Desafio" ? "Campanha de elite" : "Campanha competitiva"), trainingDone: false, lastResult: null, directorChoice: null, directorMessage: retiredIds.length > current.retiredIds.length ? "A temporada começa com uma despedida no elenco. A diretoria espera reação." : "Nova temporada, novas metas. A diretoria espera evolução.", challengeProgress: { defense: 0, three: 0 }, completedChallenges: [], seasonEnded: false, seasonAward: null, playerProgress, retiredIds, starterIds: current.starterIds.filter((id) => !retiredIds.includes(id)) };
     }),
     resetCareer: () => setState(initialState),
   }), [state, hydrated]);

@@ -53,3 +53,8 @@
 - [x] Adicionar idade e potencial aos jogadores
 - [x] Evoluir atributos do elenco entre temporadas
 - [x] Preservar progressão do elenco após iniciar nova temporada
+
+- [x] Implementar rendimento e aposentadoria conforme a idade
+- [x] Criar painel de estatísticas históricas do clube e dos jogadores
+- [x] Criar tela de preparação da nova temporada
+- [x] Permitir escolher orçamento, dificuldade e objetivos antes da temporada
