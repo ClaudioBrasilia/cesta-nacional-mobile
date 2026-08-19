@@ -4,6 +4,7 @@ export type Player = {
   id: string;
   name: string;
   number: number;
+  age: number;
   position: Position;
   overall: number;
   points: number;
@@ -36,13 +37,13 @@ export const teams: Team[] = [
 ];
 
 export const players: Player[] = [
-  { id: "caio", name: "Caio Nascimento", number: 3, position: "ARM", overall: 84, points: 16.8, rebounds: 3.4, assists: 7.1, defense: 76, energy: 92, style: "Criador de jogadas", potential: "Elite", starter: true },
-  { id: "davi", name: "Davi Moura", number: 7, position: "ARM", overall: 81, points: 18.5, rebounds: 3.1, assists: 3.9, defense: 72, energy: 88, style: "Especialista em três", potential: "Alto", starter: true },
-  { id: "lucas", name: "Lucas Pacheco", number: 11, position: "ALA", overall: 79, points: 13.2, rebounds: 6.4, assists: 2.8, defense: 80, energy: 95, style: "Ala completo", potential: "Alto", starter: true },
-  { id: "bruno", name: "Bruno Tavares", number: 23, position: "PIVÔ", overall: 82, points: 12.4, rebounds: 9.8, assists: 1.7, defense: 86, energy: 86, style: "Âncora defensiva", potential: "Elite", starter: true },
-  { id: "rafa", name: "Rafael Duarte", number: 35, position: "PIVÔ", overall: 76, points: 10.1, rebounds: 8.2, assists: 1.1, defense: 82, energy: 79, style: "Força no garrafão", potential: "Médio", starter: false },
-  { id: "italo", name: "Ítalo Santos", number: 1, position: "ARM", overall: 73, points: 8.7, rebounds: 2.8, assists: 4.6, defense: 69, energy: 98, style: "Jovem promessa", potential: "Muito alto", starter: false },
-  { id: "murilo", name: "Murilo Reis", number: 14, position: "ALA", overall: 74, points: 9.4, rebounds: 4.9, assists: 1.9, defense: 75, energy: 91, style: "Sexto homem", potential: "Alto", starter: true },
+  { id: "caio", name: "Caio Nascimento", number: 3, age: 24, position: "ARM", overall: 84, points: 16.8, rebounds: 3.4, assists: 7.1, defense: 76, energy: 92, style: "Criador de jogadas", potential: "Elite", starter: true },
+  { id: "davi", name: "Davi Moura", number: 7, age: 25, position: "ARM", overall: 81, points: 18.5, rebounds: 3.1, assists: 3.9, defense: 72, energy: 88, style: "Especialista em três", potential: "Alto", starter: true },
+  { id: "lucas", name: "Lucas Pacheco", number: 11, age: 23, position: "ALA", overall: 79, points: 13.2, rebounds: 6.4, assists: 2.8, defense: 80, energy: 95, style: "Ala completo", potential: "Alto", starter: true },
+  { id: "bruno", name: "Bruno Tavares", number: 23, age: 28, position: "PIVÔ", overall: 82, points: 12.4, rebounds: 9.8, assists: 1.7, defense: 86, energy: 86, style: "Âncora defensiva", potential: "Elite", starter: true },
+  { id: "rafa", name: "Rafael Duarte", number: 35, age: 30, position: "PIVÔ", overall: 76, points: 10.1, rebounds: 8.2, assists: 1.1, defense: 82, energy: 79, style: "Força no garrafão", potential: "Médio", starter: false },
+  { id: "italo", name: "Ítalo Santos", number: 1, age: 20, position: "ARM", overall: 73, points: 8.7, rebounds: 2.8, assists: 4.6, defense: 69, energy: 98, style: "Jovem promessa", potential: "Muito alto", starter: false },
+  { id: "murilo", name: "Murilo Reis", number: 14, age: 26, position: "ALA", overall: 74, points: 9.4, rebounds: 4.9, assists: 1.9, defense: 75, energy: 91, style: "Sexto homem", potential: "Alto", starter: true },
 ];
 
 export const seasonSchedule = [
@@ -52,11 +53,17 @@ export const seasonSchedule = [
   { round: 22, opponent: "Fortaleza Faróis", venue: "Fora", date: "19 Mai • 19:00", status: "upcoming" },
 ];
 
-export const seasonObjectives = [
+export const getSeasonObjectives = (difficulty: "Normal" | "Desafio") => difficulty === "Desafio" ? [
+  { title: "Campanha de elite", copy: "Termine a fase regular com pelo menos 20 vitórias.", progress: 0, target: 20, reward: 900 },
+  { title: "Elenco em alta", copy: "Eleve a força média do time para 82.", progress: 78, target: 82, reward: 500 },
+  { title: "Defesa visitante", copy: "Vença duas partidas fora de casa.", progress: 0, target: 2, reward: 400 },
+] : [
   { title: "Campanha competitiva", copy: "Termine a fase regular entre os quatro primeiros.", progress: 12, target: 18, reward: 600 },
   { title: "Força do elenco", copy: "Eleve a força média do time para 80.", progress: 78, target: 80, reward: 350 },
   { title: "Casa protegida", copy: "Vença três partidas no seu ginásio.", progress: 2, target: 3, reward: 250 },
 ];
+
+export const seasonObjectives = getSeasonObjectives("Normal");
 
 export const marketPlayers = [
   { id: "vitor", name: "Vítor Almeida", position: "ALA" as Position, overall: 77, points: 11.8, rebounds: 4.7, assists: 2.4, defense: 78, energy: 96, style: "Defensor versátil", potential: "Alto", cost: 420 },

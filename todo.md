@@ -47,3 +47,9 @@
 - [x] Atualizar próxima partida conforme a rodada
 - [x] Implementar nova temporada jogável
 - [x] Adicionar dificuldade, orçamento e objetivos renovados
+
+- [x] Criar premiação visual com troféu e destaques da temporada
+- [x] Gerar objetivos dinâmicos conforme a dificuldade
+- [x] Adicionar idade e potencial aos jogadores
+- [x] Evoluir atributos do elenco entre temporadas
+- [x] Preservar progressão do elenco após iniciar nova temporada
