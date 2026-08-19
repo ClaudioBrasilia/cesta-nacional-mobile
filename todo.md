@@ -22,3 +22,10 @@
 - [x] Implementar mercado de contratações com jogadores fictícios, custo e potencial
 - [x] Adicionar compra de atleta e atualização persistida do elenco
 - [x] Criar testes para persistência e contratação
+
+- [x] Implementar calendário completo da temporada
+- [x] Implementar objetivos da diretoria e consequências de campanha
+- [x] Criar tela de perfil detalhado do jogador
+- [x] Implementar evolução de atributos e histórico estatístico
+- [x] Criar primeiro pacote periódico de atualização
+- [x] Adicionar novos atletas, desafios e notas de balanceamento

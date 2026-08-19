@@ -45,11 +45,31 @@ export const players: Player[] = [
   { id: "murilo", name: "Murilo Reis", number: 14, position: "ALA", overall: 74, points: 9.4, rebounds: 4.9, assists: 1.9, defense: 75, energy: 91, style: "Sexto homem", potential: "Alto", starter: true },
 ];
 
+export const seasonSchedule = [
+  { round: 19, opponent: "Minas Montanha", venue: "Casa", date: "Hoje • 20:00", status: "next" },
+  { round: 20, opponent: "Recife Atlântico", venue: "Fora", date: "Sáb • 18:30", status: "upcoming" },
+  { round: 21, opponent: "São Paulo Central", venue: "Casa", date: "15 Mai • 20:00", status: "upcoming" },
+  { round: 22, opponent: "Fortaleza Faróis", venue: "Fora", date: "19 Mai • 19:00", status: "upcoming" },
+];
+
+export const seasonObjectives = [
+  { title: "Campanha competitiva", copy: "Termine a fase regular entre os quatro primeiros.", progress: 12, target: 18, reward: 600 },
+  { title: "Força do elenco", copy: "Eleve a força média do time para 80.", progress: 78, target: 80, reward: 350 },
+  { title: "Casa protegida", copy: "Vença três partidas no seu ginásio.", progress: 2, target: 3, reward: 250 },
+];
+
 export const marketPlayers = [
   { id: "vitor", name: "Vítor Almeida", position: "ALA" as Position, overall: 77, points: 11.8, rebounds: 4.7, assists: 2.4, defense: 78, energy: 96, style: "Defensor versátil", potential: "Alto", cost: 420 },
   { id: "joao", name: "João Viana", position: "ARM" as Position, overall: 75, points: 12.1, rebounds: 2.6, assists: 5.2, defense: 70, energy: 93, style: "Passe vertical", potential: "Muito alto", cost: 360 },
   { id: "leonardo", name: "Leonardo Siqueira", position: "PIVÔ" as Position, overall: 79, points: 9.8, rebounds: 8.9, assists: 1.3, defense: 84, energy: 82, style: "Protetor do aro", potential: "Alto", cost: 520 },
 ];
+
+export const currentUpdate = {
+  version: "0.2.0",
+  title: "Temporada de Meio de Ano",
+  subtitle: "Novos talentos, defesa valorizada e desafio da rodada.",
+  published: "Atualizado hoje",
+};
 
 export const updateNotes = [
   { title: "Forma defensiva em alta", text: "Ajustes leves valorizaram jogadores que combinam rebotes, tocos e bolas recuperadas." },
