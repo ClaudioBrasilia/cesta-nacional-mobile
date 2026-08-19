@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { players, simulateMatch, teams } from "@/lib/game-data";
+import { teams } from "@/lib/game-data";
 import { useColors } from "@/hooks/use-colors";
+import { useCareer } from "@/lib/career-store";
 
 const club = teams[0];
 const opponent = teams[1];
@@ -11,15 +12,9 @@ const opponent = teams[1];
 export default function HomeScreen() {
   const colors = useColors();
   const [strategy, setStrategy] = useState("control");
-  const [result, setResult] = useState<{ homeScore: number; awayScore: number } | null>(null);
-  const [credits, setCredits] = useState(1240);
-  const starters = useMemo(() => players.filter((player) => player.starter), []);
+  const { credits, wins, losses, roster, lastResult: result, playGame } = useCareer();
+  const starters = roster.filter((player) => player.starter);
 
-  function playGame() {
-    const next = simulateMatch(club.power, opponent.power, strategy);
-    setResult(next);
-    if (next.homeScore > next.awayScore) setCredits((value) => value + 120);
-  }
 
   return (
     <ScreenContainer className="px-5" containerClassName="bg-background">
@@ -40,7 +35,7 @@ export default function HomeScreen() {
             <View>
               <Text style={[styles.sectionLabel, { color: colors.muted }]}>SEU CLUBE</Text>
               <Text style={[styles.clubName, { color: colors.foreground }]}>{club.name}</Text>
-              <Text style={[styles.clubMeta, { color: colors.muted }]}>{club.city}  •  {club.wins}V / {club.losses}D</Text>
+              <Text style={[styles.clubMeta, { color: colors.muted }]}>{club.city}  •  {wins}V / {losses}D</Text>
             </View>
             <View style={[styles.clubBadge, { backgroundColor: club.color }]}><IconSymbol name="basketball.fill" size={30} color="#071A2B" /></View>
           </View>
@@ -67,7 +62,7 @@ export default function HomeScreen() {
 
         {result && <View style={[styles.resultCard, { backgroundColor: result.homeScore > result.awayScore ? "#103A32" : "#42282B", borderColor: result.homeScore > result.awayScore ? colors.success : colors.error }]}><Text style={[styles.resultKicker, { color: result.homeScore > result.awayScore ? colors.success : colors.error }]}>{result.homeScore > result.awayScore ? "VITÓRIA NO GINÁSIO" : "DERROTA NO DETALHE"}</Text><Text style={[styles.resultScore, { color: colors.foreground }]}>{result.homeScore} <Text style={{ color: colors.muted }}>—</Text> {result.awayScore}</Text><Text style={[styles.resultCopy, { color: colors.muted }]}>{result.homeScore > result.awayScore ? "Seu plano funcionou. O elenco ganhou confiança e 120 créditos." : "A equipe lutou até o fim. Ajuste o treino e tente novamente."}</Text></View>}
 
-        <Pressable onPress={playGame} style={({ pressed }) => [styles.playButton, { backgroundColor: colors.primary }, pressed && { opacity: 0.86, transform: [{ scale: 0.98 }] }]}><IconSymbol name="basketball.fill" size={22} color="#FFFFFF" /><Text style={styles.playText}>{result ? "Jogar novamente" : "Jogar partida"}</Text><IconSymbol name="chevron.right" size={22} color="#FFFFFF" /></Pressable>
+        <Pressable onPress={() => playGame(strategy)} style={({ pressed }) => [styles.playButton, { backgroundColor: colors.primary }, pressed && { opacity: 0.86, transform: [{ scale: 0.98 }] }]}><IconSymbol name="basketball.fill" size={22} color="#FFFFFF" /><Text style={styles.playText}>{result ? "Jogar novamente" : "Jogar partida"}</Text><IconSymbol name="chevron.right" size={22} color="#FFFFFF" /></Pressable>
 
         <View style={styles.sectionHeader}><Text style={[styles.sectionTitle, { color: colors.foreground }]}>Destaques do elenco</Text><Text style={[styles.roundText, { color: colors.primary }]}>Ver elenco</Text></View>
         <View style={styles.playerStrip}>{starters.slice(0, 3).map((player) => <View key={player.id} style={[styles.playerCard, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={[styles.avatar, { backgroundColor: player.position === "PIVÔ" ? "#FFD166" : "#F47B20" }]}><Text style={styles.avatarText}>{player.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}</Text></View><Text numberOfLines={1} style={[styles.playerName, { color: colors.foreground }]}>{player.name}</Text><Text style={[styles.playerRole, { color: colors.muted }]}>{player.position} • {player.overall} OVR</Text></View>)}</View>

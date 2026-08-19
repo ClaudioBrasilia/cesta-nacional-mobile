@@ -10,9 +10,15 @@
 - [x] Implementar simulação de partidas com decisões táticas
 - [x] Implementar tela de resultado e atualização da classificação
 - [x] Implementar treinamento e evolução local dos jogadores
-- [ ] Implementar mercado simples de contratações
+- [x] Implementar mercado simples de contratações
 - [x] Implementar Central da Liga com notas de atualização locais
-- [ ] Criar persistência local da carreira
+- [x] Criar persistência local da carreira
 - [x] Adicionar testes unitários para simulação e progressão
-- [ ] Validar fluxos mobile e corrigir erros de runtime
-- [ ] Salvar checkpoint inicial jogável
+- [x] Validar fluxos mobile e corrigir erros de runtime
+- [x] Salvar checkpoint inicial jogável
+
+- [x] Substituir Brasília Cerrado por um clube totalmente fictício e revisar referências de equipes reais
+- [x] Implementar persistência local de créditos, elenco, titulares, energia e resultados
+- [x] Implementar mercado de contratações com jogadores fictícios, custo e potencial
+- [x] Adicionar compra de atleta e atualização persistida do elenco
+- [x] Criar testes para persistência e contratação

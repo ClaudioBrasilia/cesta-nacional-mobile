@@ -27,7 +27,7 @@ export type Team = {
 };
 
 export const teams: Team[] = [
-  { id: "cerrado", name: "Brasília Cerrado", city: "Distrito Federal", color: "#F47B20", wins: 12, losses: 6, power: 78 },
+  { id: "cerrado", name: "Brasília Estrelas", city: "Distrito Federal", color: "#F47B20", wins: 12, losses: 6, power: 78 },
   { id: "minas", name: "Minas Montanha", city: "Minas Gerais", color: "#FFD166", wins: 14, losses: 4, power: 84 },
   { id: "central", name: "São Paulo Central", city: "São Paulo", color: "#5B8DEF", wins: 13, losses: 5, power: 82 },
   { id: "atlantico", name: "Recife Atlântico", city: "Pernambuco", color: "#3DDC97", wins: 10, losses: 8, power: 75 },
@@ -43,6 +43,12 @@ export const players: Player[] = [
   { id: "rafa", name: "Rafael Duarte", number: 35, position: "PIVÔ", overall: 76, points: 10.1, rebounds: 8.2, assists: 1.1, defense: 82, energy: 79, style: "Força no garrafão", potential: "Médio", starter: false },
   { id: "italo", name: "Ítalo Santos", number: 1, position: "ARM", overall: 73, points: 8.7, rebounds: 2.8, assists: 4.6, defense: 69, energy: 98, style: "Jovem promessa", potential: "Muito alto", starter: false },
   { id: "murilo", name: "Murilo Reis", number: 14, position: "ALA", overall: 74, points: 9.4, rebounds: 4.9, assists: 1.9, defense: 75, energy: 91, style: "Sexto homem", potential: "Alto", starter: true },
+];
+
+export const marketPlayers = [
+  { id: "vitor", name: "Vítor Almeida", position: "ALA" as Position, overall: 77, points: 11.8, rebounds: 4.7, assists: 2.4, defense: 78, energy: 96, style: "Defensor versátil", potential: "Alto", cost: 420 },
+  { id: "joao", name: "João Viana", position: "ARM" as Position, overall: 75, points: 12.1, rebounds: 2.6, assists: 5.2, defense: 70, energy: 93, style: "Passe vertical", potential: "Muito alto", cost: 360 },
+  { id: "leonardo", name: "Leonardo Siqueira", position: "PIVÔ" as Position, overall: 79, points: 9.8, rebounds: 8.9, assists: 1.3, defense: 84, energy: 82, style: "Protetor do aro", potential: "Alto", cost: 520 },
 ];
 
 export const updateNotes = [
