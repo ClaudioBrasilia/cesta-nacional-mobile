@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
-import { players, simulateMatch } from "@/lib/game-data";
+import { contractDefaults, players, simulateMatch, type Player } from "@/lib/game-data";
 
 const STORAGE_KEY = "cesta-nacional-career-v1";
 
@@ -26,6 +26,7 @@ export type CareerState = {
   retiredIds: string[];
   seasonBudget: number;
   seasonObjective: string;
+  contracts: Record<string, { salary: number; yearsRemaining: number }>;
 };
 
 const initialState: CareerState = {
@@ -50,17 +51,19 @@ const initialState: CareerState = {
   retiredIds: [],
   seasonBudget: 1240,
   seasonObjective: "Campanha competitiva",
+  contracts: Object.fromEntries(Object.entries(contractDefaults).map(([id, contract]) => [id, { salary: contract.salary, yearsRemaining: contract.years }])),
 };
 
 type CareerContextValue = CareerState & {
   hydrated: boolean;
-  roster: typeof players;
+  roster: Array<Player & { salary: number; contractYears: number }> ;
   toggleStarter: (playerId: string) => void;
   buyPlayer: (playerId: string, cost: number) => boolean;
   train: () => void;
   playGame: (strategy: string) => { homeScore: number; awayScore: number };
   chooseDirectorDecision: (choice: string) => void;
   startNextSeason: (budgetBonus?: number, difficulty?: "Normal" | "Desafio", objective?: string) => void;
+  renewContract: (playerId: string, years?: number) => boolean;
   resetCareer: () => void;
 };
 
@@ -86,7 +89,7 @@ export function CareerProvider({ children }: PropsWithChildren) {
   const value = useMemo<CareerContextValue>(() => ({
     ...state,
     hydrated,
-    roster: players.filter((player) => state.ownedIds.includes(player.id) && !state.retiredIds.includes(player.id)).map((player) => { const age = player.age + state.season - 1; const agePenalty = age >= 30 ? Math.min(6, Math.floor((age - 29) / 2)) : 0; return { ...player, age, overall: Math.max(60, player.overall + (state.playerProgress[player.id] ?? 0) - agePenalty), starter: state.starterIds.includes(player.id) }; }),
+    roster: players.filter((player) => state.ownedIds.includes(player.id) && !state.retiredIds.includes(player.id)).map((player) => { const age = player.age + state.season - 1; const agePenalty = age >= 30 ? Math.min(6, Math.floor((age - 29) / 2)) : 0; const contract = state.contracts[player.id] ?? { salary: 100, yearsRemaining: 1 }; return { ...player, age, overall: Math.max(60, player.overall + (state.playerProgress[player.id] ?? 0) - agePenalty), salary: contract.salary, contractYears: contract.yearsRemaining, starter: state.starterIds.includes(player.id) }; }),
     toggleStarter: (playerId) => setState((current) => {
       const isStarter = current.starterIds.includes(playerId);
       if (isStarter) return { ...current, starterIds: current.starterIds.filter((id) => id !== playerId) };
@@ -98,7 +101,7 @@ export function CareerProvider({ children }: PropsWithChildren) {
       setState((current) => {
         if (current.ownedIds.includes(playerId) || current.credits < cost) return current;
         success = true;
-        return { ...current, credits: current.credits - cost, ownedIds: [...current.ownedIds, playerId] };
+        return { ...current, credits: current.credits - cost, ownedIds: [...current.ownedIds, playerId], contracts: { ...current.contracts, [playerId]: { salary: Math.max(85, Math.round(cost * 0.28)), yearsRemaining: 2 } } };
       });
       return success;
     },
@@ -118,11 +121,23 @@ export function CareerProvider({ children }: PropsWithChildren) {
         const seasonEnded = nextWins >= 18;
         const seasonAward = seasonEnded ? (nextWins >= 20 ? "Campeão da Conferência" : "Campanha de destaque") : current.seasonAward;
         const seasonHistory = seasonEnded && !current.seasonEnded ? [...current.seasonHistory, { season: current.season, wins: nextWins, losses: nextLosses, award: seasonAward ?? "Campanha concluída" }] : current.seasonHistory;
-        return { ...current, lastResult: nextResult, wins: nextWins, losses: nextLosses, round: current.round + 1, credits: current.credits + (won ? 120 : 35) + (completed.length - current.completedChallenges.length) * 180, trainingDone: false, directorMessage: won ? "Boa resposta. A diretoria liberou verba extra para o próximo desafio." : "A diretoria pede reação imediata no próximo jogo.", challengeProgress: { defense: defenseProgress, three: threeProgress }, completedChallenges: completed, seasonEnded, seasonAward, seasonHistory };
+        const payroll = current.ownedIds.reduce((total, id) => total + (current.contracts[id]?.salary ?? 100), 0);
+        return { ...current, lastResult: nextResult, wins: nextWins, losses: nextLosses, round: current.round + 1, credits: Math.max(0, current.credits + (won ? 120 : 35) + (completed.length - current.completedChallenges.length) * 180 - payroll), trainingDone: false, directorMessage: won ? "Boa resposta. A diretoria liberou verba extra para o próximo desafio." : "A diretoria pede reação imediata no próximo jogo.", challengeProgress: { defense: defenseProgress, three: threeProgress }, completedChallenges: completed, seasonEnded, seasonAward, seasonHistory };
       });
       return nextResult;
     },
     chooseDirectorDecision: (choice) => setState((current) => ({ ...current, directorChoice: choice, credits: current.credits + (choice === "base" ? 40 : 25), directorMessage: choice === "base" ? "A base recebeu investimento e um novo talento será observado." : "A torcida ganhou prioridade e o ginásio terá clima especial." })),
+    renewContract: (playerId, years = 2) => {
+      let success = false;
+      setState((current) => {
+        const contract = current.contracts[playerId] ?? { salary: 100, yearsRemaining: 0 };
+        const fee = contract.salary * years;
+        if (!current.ownedIds.includes(playerId) || current.credits < fee) return current;
+        success = true;
+        return { ...current, credits: current.credits - fee, contracts: { ...current.contracts, [playerId]: { ...contract, yearsRemaining: contract.yearsRemaining + years } } };
+      });
+      return success;
+    },
     startNextSeason: (budgetBonus = 300, difficultyOption, objective) => setState((current) => {
       const playerProgress = { ...current.playerProgress };
       const retiredIds = [...current.retiredIds];
@@ -135,7 +150,7 @@ export function CareerProvider({ children }: PropsWithChildren) {
         playerProgress[id] = (playerProgress[id] ?? 0) + gain;
       });
       const nextDifficulty: "Normal" | "Desafio" = difficultyOption ?? (current.season % 2 === 0 ? "Normal" : "Desafio");
-      return { ...current, season: current.season + 1, round: 1, wins: 0, losses: 0, credits: current.credits + budgetBonus, seasonBudget: current.credits + budgetBonus, difficulty: nextDifficulty, seasonObjective: objective ?? (nextDifficulty === "Desafio" ? "Campanha de elite" : "Campanha competitiva"), trainingDone: false, lastResult: null, directorChoice: null, directorMessage: retiredIds.length > current.retiredIds.length ? "A temporada começa com uma despedida no elenco. A diretoria espera reação." : "Nova temporada, novas metas. A diretoria espera evolução.", challengeProgress: { defense: 0, three: 0 }, completedChallenges: [], seasonEnded: false, seasonAward: null, playerProgress, retiredIds, starterIds: current.starterIds.filter((id) => !retiredIds.includes(id)) };
+      return { ...current, season: current.season + 1, round: 1, wins: 0, losses: 0, credits: current.credits + budgetBonus, seasonBudget: current.credits + budgetBonus, difficulty: nextDifficulty, seasonObjective: objective ?? (nextDifficulty === "Desafio" ? "Campanha de elite" : "Campanha competitiva"), trainingDone: false, lastResult: null, directorChoice: null, directorMessage: retiredIds.length > current.retiredIds.length ? "A temporada começa com uma despedida no elenco. A diretoria espera reação." : "Nova temporada, novas metas. A diretoria espera evolução.", challengeProgress: { defense: 0, three: 0 }, completedChallenges: [], seasonEnded: false, seasonAward: null, playerProgress, retiredIds, starterIds: current.starterIds.filter((id) => !retiredIds.includes(id)), contracts: Object.fromEntries(Object.entries(current.contracts).map(([id, contract]) => [id, { ...contract, yearsRemaining: Math.max(0, contract.yearsRemaining - 1) }])) };
     }),
     resetCareer: () => setState(initialState),
   }), [state, hydrated]);

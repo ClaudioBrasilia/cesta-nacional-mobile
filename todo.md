@@ -58,3 +58,10 @@
 - [x] Criar painel de estatísticas históricas do clube e dos jogadores
 - [x] Criar tela de preparação da nova temporada
 - [x] Permitir escolher orçamento, dificuldade e objetivos antes da temporada
+
+- [x] Adicionar contratos e salários aos atletas
+- [x] Implementar renovação de contrato antes da temporada
+- [x] Criar gráfico de evolução de pontos e rebotes
+- [x] Criar gráfico de evolução do overall
+- [x] Avaliar e registrar a fonte pública de estatísticas da Liga Nacional
+- [x] Criar estrutura de referência estatística para balanceamento

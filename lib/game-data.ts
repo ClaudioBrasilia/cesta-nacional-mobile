@@ -46,6 +46,17 @@ export const players: Player[] = [
   { id: "murilo", name: "Murilo Reis", number: 14, age: 26, position: "ALA", overall: 74, points: 9.4, rebounds: 4.9, assists: 1.9, defense: 75, energy: 91, style: "Sexto homem", potential: "Alto", starter: true },
 ];
 
+export const contractDefaults: Record<string, { salary: number; years: number }> = {
+  caio: { salary: 180, years: 2 }, davi: { salary: 165, years: 2 }, lucas: { salary: 150, years: 3 }, bruno: { salary: 190, years: 2 }, rafa: { salary: 130, years: 1 }, italo: { salary: 90, years: 4 }, murilo: { salary: 110, years: 2 }, vitor: { salary: 125, years: 2 }, joao: { salary: 105, years: 3 }, leonardo: { salary: 145, years: 2 },
+};
+
+export const lnbBalanceReference = {
+  source: "Liga Nacional de Basquete",
+  categories: ["Pontos", "Rebotes", "Assistências", "Tocos", "Bolas recuperadas", "Eficiência", "+/-", "Turnovers", "Aproveitamento"],
+  mode: "Referência manual para balanceamento fictício",
+  updated: "Agosto de 2026",
+};
+
 export const seasonSchedule = [
   { round: 19, opponent: "Minas Montanha", venue: "Casa", date: "Hoje • 20:00", status: "next" },
   { round: 20, opponent: "Recife Atlântico", venue: "Fora", date: "Sáb • 18:30", status: "upcoming" },
