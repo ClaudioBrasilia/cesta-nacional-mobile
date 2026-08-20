@@ -1,6 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type PropsWithChildren } from "react";
 import { contractDefaults, players, simulateMatch, type Player } from "@/lib/game-data";
+import { useAuth } from "@/lib/auth-store";
+import { supabase } from "@/lib/supabase";
 
 const STORAGE_KEY = "cesta-nacional-career-v1";
 
@@ -72,6 +74,8 @@ const CareerContext = createContext<CareerContextValue | null>(null);
 export function CareerProvider({ children }: PropsWithChildren) {
   const [state, setState] = useState<CareerState>(initialState);
   const [hydrated, setHydrated] = useState(false);
+  const { user } = useAuth();
+  const remoteHydratedFor = useRef<string | null>(null);
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY).then((stored) => {
@@ -85,6 +89,30 @@ export function CareerProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (hydrated) AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [hydrated, state]);
+
+  useEffect(() => {
+    if (!hydrated || !user) {
+      remoteHydratedFor.current = null;
+      return;
+    }
+    let cancelled = false;
+    remoteHydratedFor.current = null;
+    supabase.from("career_snapshots").select("state").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+      if (cancelled) return;
+      if (data?.state) setState({ ...initialState, ...(data.state as Partial<CareerState>) });
+      remoteHydratedFor.current = user.id;
+    }, () => {
+      remoteHydratedFor.current = user.id;
+    });
+    return () => { cancelled = true; };
+  }, [hydrated, user?.id]);
+
+  useEffect(() => {
+    if (!hydrated || !user || remoteHydratedFor.current !== user.id) return;
+    supabase.from("career_snapshots").upsert({ user_id: user.id, state, updated_at: new Date().toISOString() }).then(({ error }) => {
+      if (error) console.warn("[Supabase] Falha ao sincronizar carreira:", error.message);
+    });
+  }, [hydrated, state, user?.id]);
 
   const value = useMemo<CareerContextValue>(() => ({
     ...state,

@@ -9,6 +9,7 @@ import { Platform } from "react-native";
 import "@/lib/_core/nativewind-pressable";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { CareerProvider } from "@/lib/career-store";
+import { AuthProvider } from "@/lib/auth-store";
 import {
   SafeAreaFrameContext,
   SafeAreaInsetsContext,
@@ -80,6 +81,7 @@ export default function RootLayout() {
   }, [initialInsets, initialFrame]);
 
   const content = (
+    <AuthProvider>
     <CareerProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
@@ -96,6 +98,7 @@ export default function RootLayout() {
       </trpc.Provider>
       </GestureHandlerRootView>
     </CareerProvider>
+    </AuthProvider>
   );
 
   const shouldOverrideSafeArea = Platform.OS === "web";

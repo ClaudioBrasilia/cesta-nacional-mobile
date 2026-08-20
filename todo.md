@@ -83,3 +83,15 @@
 - [x] Adicionar configuração e documentação de deploy no Vercel
 - [x] Criar e sincronizar novo repositório GitHub
 - [x] Validar build web e rotas principais antes da entrega
+
+- [ ] Mapear tabelas, rotas e armazenamento atuais do backend
+- [ ] Definir modelo Supabase para carreira, temporadas e atualizações
+- [ ] Configurar integração segura com Supabase
+- [ ] Manter fallback offline com AsyncStorage
+- [ ] Validar sincronização e migração sem perda de dados
+
+- [x] Implementar cadastro, login e recuperação por e-mail no Supabase
+- [x] Adicionar sessão persistente e logout
+- [ ] Aplicar no Supabase a tabela de carreira vinculada ao usuário com RLS
+- [x] Implementar sincronização da carreira autenticada com fallback offline
+- [x] Validar configuração, TypeScript e testes da autenticação e sincronização
