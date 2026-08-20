@@ -1,0 +1,7 @@
+{
+  "buildCommand": "pnpm export:web",
+  "outputDirectory": "dist",
+  "framework": null,
+  "cleanUrls": true,
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
