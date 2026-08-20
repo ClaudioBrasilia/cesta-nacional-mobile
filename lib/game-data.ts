@@ -50,6 +50,13 @@ export const contractDefaults: Record<string, { salary: number; years: number }>
   caio: { salary: 180, years: 2 }, davi: { salary: 165, years: 2 }, lucas: { salary: 150, years: 3 }, bruno: { salary: 190, years: 2 }, rafa: { salary: 130, years: 1 }, italo: { salary: 90, years: 4 }, murilo: { salary: 110, years: 2 }, vitor: { salary: 125, years: 2 }, joao: { salary: 105, years: 3 }, leonardo: { salary: 145, years: 2 },
 };
 
+export const historicSeasonReference = {
+  season: "NBB 2024/2025",
+  championBenchmark: { games: 34, wins: 29, losses: 5, pointsFor: 2796, pointsAgainst: 2411 },
+  competitiveBenchmark: { games: 34, wins: 19, losses: 15, pointsFor: 2759, pointsAgainst: 2732 },
+  use: "Faixas agregadas para balancear objetivos e atributos fictícios",
+};
+
 export const lnbBalanceReference = {
   source: "Liga Nacional de Basquete",
   categories: ["Pontos", "Rebotes", "Assistências", "Tocos", "Bolas recuperadas", "Eficiência", "+/-", "Turnovers", "Aproveitamento"],

@@ -65,3 +65,8 @@
 - [x] Criar gráfico de evolução do overall
 - [x] Avaliar e registrar a fonte pública de estatísticas da Liga Nacional
 - [x] Criar estrutura de referência estatística para balanceamento
+
+- [x] Definir escopo seguro para dados históricos da temporada anterior
+- [x] Coletar métricas agregadas sem importar identidades reais
+- [x] Aplicar referência histórica ao balanceamento dos jogadores fictícios
+- [x] Documentar fontes, data de consulta e limitações de uso
