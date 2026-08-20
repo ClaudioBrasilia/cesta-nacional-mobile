@@ -78,8 +78,8 @@
 - [x] Integrar resultado da partida acompanhada à carreira
 - [x] Manter jogo rápido como alternativa
 
-- [ ] Definir nome e visibilidade do novo repositório GitHub
-- [ ] Preparar export web do Expo para teste no Vercel
-- [ ] Adicionar configuração e documentação de deploy no Vercel
-- [ ] Criar e sincronizar novo repositório GitHub
-- [ ] Validar build web e rotas principais antes da entrega
+- [x] Definir nome e visibilidade do novo repositório GitHub
+- [x] Preparar export web do Expo para teste no Vercel
+- [x] Adicionar configuração e documentação de deploy no Vercel
+- [x] Criar e sincronizar novo repositório GitHub
+- [x] Validar build web e rotas principais antes da entrega
