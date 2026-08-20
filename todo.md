@@ -70,3 +70,10 @@
 - [x] Coletar métricas agregadas sem importar identidades reais
 - [x] Aplicar referência histórica ao balanceamento dos jogadores fictícios
 - [x] Documentar fontes, data de consulta e limitações de uso
+
+- [x] Criar modo de partida acompanhada por quartos
+- [x] Adicionar eventos progressivos e placar ao vivo
+- [x] Adicionar decisões táticas durante a partida
+- [x] Permitir substituições e controle de ritmo
+- [x] Integrar resultado da partida acompanhada à carreira
+- [x] Manter jogo rápido como alternativa
