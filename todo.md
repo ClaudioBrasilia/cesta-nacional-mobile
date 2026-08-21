@@ -98,3 +98,9 @@
 
 - [x] Corrigir armazenamento de sessão Supabase no SSR/web
 - [x] Validar preview web após a correção de autenticação
+
+- [x] Corrigir injeção de VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no bundle Expo web
+- [x] Validar preview web sem erro de configuração Supabase
+
+- [ ] Sincronizar a correção do Supabase com a branch main do GitHub e concluir o merge remoto
+- [ ] Criar GitHub Actions para build Android APK/AAB e orientar o fluxo de build iOS
