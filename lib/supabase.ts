@@ -3,15 +3,18 @@ import { createClient, type SupportedStorage } from "@supabase/supabase-js";
 import { Platform } from "react-native";
 import Constants from "expo-constants";
 
-const extra = Constants.expoConfig?.extra as { supabaseUrl?: string; supabaseAnonKey?: string } | undefined;
+type ExpoManifest = { extra?: { supabaseUrl?: string; supabaseAnonKey?: string } };
+const constants = Constants as typeof Constants & { manifest2?: ExpoManifest; manifest?: ExpoManifest };
+const manifest = constants.expoConfig ?? constants.manifest2 ?? constants.manifest;
+const extra = manifest?.extra;
 
 // No cliente (Metro) só chega o que tem prefixo EXPO_PUBLIC_; scripts/load-env.js
 // copia as VITE_* da plataforma para lá. O campo extra cobre builds Expo já configurados.
 // O fallback VITE_* mantém funcionando o que roda em Node (servidor/Vercel).
 const supabaseUrl =
-  process.env.EXPO_PUBLIC_SUPABASE_URL ?? extra?.supabaseUrl ?? process.env.VITE_SUPABASE_URL;
+  extra?.supabaseUrl ?? process.env.EXPO_PUBLIC_SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
 const supabaseAnonKey =
-  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? extra?.supabaseAnonKey ?? process.env.VITE_SUPABASE_ANON_KEY;
+  extra?.supabaseAnonKey ?? process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error("Supabase não configurado: defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.");
