@@ -102,5 +102,16 @@
 - [x] Corrigir injeção de VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no bundle Expo web
 - [x] Validar preview web sem erro de configuração Supabase
 
-- [ ] Sincronizar a correção do Supabase com a branch main do GitHub e concluir o merge remoto
+- [x] Sincronizar a correção do Supabase com a branch main do GitHub e concluir o merge remoto
 - [ ] Criar GitHub Actions para build Android APK/AAB e orientar o fluxo de build iOS
+
+- [x] Criar Liga Nacional Online assíncrona com código de entrada
+- [x] Adicionar rodadas, escalações e resultados compartilhados no Supabase
+- [x] Implementar classificação online e tela mobile com autenticação
+- [x] Testar regras server-side e documentar a aplicação da migração multiplayer
+- [ ] Aplicar a migração 002_online_league.sql no projeto Supabase
+
+- [x] Adicionar confrontos individuais entre técnicos na Liga Online
+- [x] Adicionar prazo de rodada e estado de confirmação
+- [x] Adicionar histórico detalhado de partidas e notificações da liga
+- [x] Gerar arquivo SQL final copiável e documentar o teste com duas contas
