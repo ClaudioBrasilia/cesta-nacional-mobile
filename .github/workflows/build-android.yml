@@ -1,0 +1,116 @@
+name: Build Android
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact:
+        description: 'Tipo de artefato'
+        required: true
+        default: 'apk'
+        type: choice
+        options:
+          - apk
+          - aab
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-android:
+    name: Build Android ${{ github.event.inputs.artifact || 'apk' }}
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_VERSION: 20
+      JAVA_VERSION: 17
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Expo prebuild (Android)
+        run: npx expo prebuild --platform android --clean
+
+      - name: Restore keystore
+        run: |
+          mkdir -p android/app
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+
+      - name: Configure signing
+        run: |
+          cat >> android/gradle.properties <<EOF
+
+          MYAPP_UPLOAD_STORE_FILE=release.keystore
+          MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
+          MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}
+          EOF
+
+      - name: (Opcional) Override versionCode
+        if: false
+        run: |
+          sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
+
+      - name: Build APK
+        if: github.event.inputs.artifact == 'apk' || github.event_name == 'push'
+        run: |
+          cd android
+          ./gradlew assembleRelease
+
+      - name: Build AAB
+        if: github.event.inputs.artifact == 'aab'
+        run: |
+          cd android
+          ./gradlew bundleRelease
+
+      - name: Upload APK artifact
+        if: github.event.inputs.artifact == 'apk' || github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload AAB artifact
+        if: github.event.inputs.artifact == 'aab'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+
+      - name: Upload Release asset (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            android/app/build/outputs/apk/release/app-release.apk
+            android/app/build/outputs/bundle/release/app-release.aab
