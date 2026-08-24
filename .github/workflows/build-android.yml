@@ -23,10 +23,18 @@ jobs:
     env:
       NODE_VERSION: 20
       JAVA_VERSION: 17
+      # Necessarias no prebuild: viram extra.supabaseUrl / extra.supabaseAnonKey
+      EXPO_PUBLIC_SUPABASE_URL: ${{ vars.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Validar variaveis do app
+        run: |
+          test -n "$EXPO_PUBLIC_SUPABASE_URL" || { echo "Falta a variable EXPO_PUBLIC_SUPABASE_URL"; exit 1; }
+          test -n "$EXPO_PUBLIC_SUPABASE_ANON_KEY" || { echo "Falta a variable EXPO_PUBLIC_SUPABASE_ANON_KEY"; exit 1; }
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
@@ -45,6 +53,9 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Cache Gradle
         uses: actions/cache@v4
         with:
@@ -61,56 +72,78 @@ jobs:
       - name: Expo prebuild (Android)
         run: npx expo prebuild --platform android --clean
 
-      - name: Restore keystore
+      - name: Restore or generate keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
           mkdir -p android/app
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | tr -d '\n' | base64 -d > android/app/release.keystore
+            echo "USED_SECRET_KEYSTORE=true" >> $GITHUB_ENV
+          else
+            echo "Nenhum ANDROID_KEYSTORE_BASE64: gerando keystore temporario no CI."
+            keytool -genkeypair -v \
+              -keystore android/app/release.keystore \
+              -alias ci \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass cicicici -keypass cicicici \
+              -dname "CN=Cesta Nacional, OU=CI, O=Cesta Nacional, L=Brasilia, ST=DF, C=BR"
+            echo "USED_SECRET_KEYSTORE=false" >> $GITHUB_ENV
+          fi
 
       - name: Configure signing
         run: |
-          cat >> android/gradle.properties <<EOF
+          if [ "$USED_SECRET_KEYSTORE" = "true" ]; then
+            ALIAS='${{ secrets.ANDROID_KEY_ALIAS }}'
+            STOREPASS='${{ secrets.ANDROID_KEYSTORE_PASSWORD }}'
+            KEYPASS='${{ secrets.ANDROID_KEY_PASSWORD }}'
+          else
+            ALIAS=ci; STOREPASS=cicicici; KEYPASS=cicicici
+          fi
+          {
+            echo ""
+            echo "MYAPP_UPLOAD_STORE_FILE=release.keystore"
+            echo "MYAPP_UPLOAD_KEY_ALIAS=$ALIAS"
+            echo "MYAPP_UPLOAD_STORE_PASSWORD=$STOREPASS"
+            echo "MYAPP_UPLOAD_KEY_PASSWORD=$KEYPASS"
+          } >> android/gradle.properties
 
-          MYAPP_UPLOAD_STORE_FILE=release.keystore
-          MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
-          MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}
-          EOF
+      - name: Aplicar signingConfig release
+        run: node scripts/ci/prepare-android-release.mjs
 
-      - name: (Opcional) Override versionCode
-        if: false
+      - name: Override versionCode
         run: |
           sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
 
       - name: Build APK
-        if: github.event.inputs.artifact == 'apk' || github.event_name == 'push'
+        if: github.event.inputs.artifact != 'aab'
         run: |
           cd android
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease --no-daemon
 
       - name: Build AAB
         if: github.event.inputs.artifact == 'aab'
         run: |
           cd android
-          ./gradlew bundleRelease
+          ./gradlew bundleRelease --no-daemon
 
       - name: Upload APK artifact
-        if: github.event.inputs.artifact == 'apk' || github.event_name == 'push'
+        if: github.event.inputs.artifact != 'aab'
         uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
-          path: android/app/build/outputs/apk/release/app-release.apk
+          path: android/app/build/outputs/apk/release/*.apk
 
       - name: Upload AAB artifact
         if: github.event.inputs.artifact == 'aab'
         uses: actions/upload-artifact@v4
         with:
           name: app-release-aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          path: android/app/build/outputs/bundle/release/*.aab
 
       - name: Upload Release asset (tags only)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            android/app/build/outputs/apk/release/app-release.apk
-            android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/apk/release/*.apk
