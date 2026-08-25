@@ -10,6 +10,10 @@ jobs:
   checks:
     name: Typecheck, Lint and Test
     runs-on: ubuntu-latest
+    env:
+      # O teste usa VITE_*; aceita os dois padrões de nome já usados pelo projeto.
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || vars.EXPO_PUBLIC_SUPABASE_URL || secrets.VITE_SUPABASE_URL || secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY || vars.EXPO_PUBLIC_SUPABASE_ANON_KEY || secrets.VITE_SUPABASE_ANON_KEY || secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
 
     steps:
       - name: Checkout
@@ -24,10 +28,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Validate Supabase configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$VITE_SUPABASE_URL" || {
+            echo "Falta configurar VITE_SUPABASE_URL (ou EXPO_PUBLIC_SUPABASE_URL) nas Variables/Secrets do repositório."
+            exit 1
+          }
+          test -n "$VITE_SUPABASE_ANON_KEY" || {
+            echo "Falta configurar VITE_SUPABASE_ANON_KEY (ou EXPO_PUBLIC_SUPABASE_ANON_KEY) nas Variables/Secrets do repositório."
+            exit 1
+          }
 
       - name: Typecheck
         run: pnpm check
