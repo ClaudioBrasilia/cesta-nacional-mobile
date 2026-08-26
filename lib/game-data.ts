@@ -28,12 +28,12 @@ export type Team = {
 };
 
 export const teams: Team[] = [
-  { id: "cerrado", name: "Brasília Estrelas", city: "Distrito Federal", color: "#F47B20", wins: 12, losses: 6, power: 78 },
-  { id: "minas", name: "Minas Montanha", city: "Minas Gerais", color: "#FFD166", wins: 14, losses: 4, power: 84 },
-  { id: "central", name: "São Paulo Central", city: "São Paulo", color: "#5B8DEF", wins: 13, losses: 5, power: 82 },
-  { id: "atlantico", name: "Recife Atlântico", city: "Pernambuco", color: "#3DDC97", wins: 10, losses: 8, power: 75 },
-  { id: "farois", name: "Fortaleza Faróis", city: "Ceará", color: "#EE6C4D", wins: 9, losses: 9, power: 73 },
-  { id: "fales", name: "Bauru Falcões", city: "São Paulo", color: "#A78BFA", wins: 11, losses: 7, power: 79 },
+  { id: "cerrado", name: "Brasília Estrelas", city: "Distrito Federal", color: "#E58B4B", wins: 12, losses: 6, power: 78 },
+  { id: "minas", name: "Minas Montanha", city: "Minas Gerais", color: "#E6BC72", wins: 14, losses: 4, power: 84 },
+  { id: "central", name: "São Paulo Central", city: "São Paulo", color: "#6D93DA", wins: 13, losses: 5, power: 82 },
+  { id: "atlantico", name: "Recife Atlântico", city: "Pernambuco", color: "#72C7A4", wins: 10, losses: 8, power: 75 },
+  { id: "farois", name: "Fortaleza Faróis", city: "Ceará", color: "#D98273", wins: 9, losses: 9, power: 73 },
+  { id: "fales", name: "Bauru Falcões", city: "São Paulo", color: "#9D8BD6", wins: 11, losses: 7, power: 79 },
 ];
 
 export const players: Player[] = [
